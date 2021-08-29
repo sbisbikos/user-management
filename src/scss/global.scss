@@ -1,1 +1,42 @@
-@import "@/scss/mini-reset";
+@import "./resources/mini-reset";
+
+// tokens
+$text-color: #2c3e50;
+$buefy-accent: #7957d5;
+$blue-accent: #2792e6;
+$flex-fractional-size: 1 1 0;
+$spacing-unit-sml: 8px;
+$spacing-unit-med: 16px;
+$spacing-unit-lg: 24px;
+
+// mixins
+@mixin content-stretch {
+  flex: $flex-fractional-size;
+}
+
+@mixin content-auto-size($size) {
+  flex: 0 0 #{$size};
+}
+
+// classes
+.column-stretch {
+  @include content-stretch;
+  margin-right: $spacing-unit-lg;
+}
+
+.active-column {
+  @include content-auto-size(auto);
+  margin: 0 60px;
+}
+
+.country-column {
+  @include content-auto-size(100px);
+}
+
+.created-column {
+  @include content-auto-size(204px);
+}
+
+.edit-column {
+  @include content-auto-size(50px);
+}

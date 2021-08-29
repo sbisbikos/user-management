@@ -107,7 +107,6 @@ export default {
     toggleAddUpdateUser(value = -1) {
       // if index is provided we update
       // this will also clear the object is we do a standard add
-      debugger;
       this.userToEdit = Number.isInteger(value) && value > -1 ? this.users[value] : {};
       const test = !this.isAddUpdateUserVisible;
       this.isAddUpdateUserVisible = test;

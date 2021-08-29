@@ -47,7 +47,6 @@ export default {
   },
   methods: {
     changeActive(value) {
-      debugger;
       const user = extensions.DeepCopy(this.userInfo);
       this.updateUser({ ...user, isActive: value });
     },

@@ -35,7 +35,6 @@ export default new Vuex.Store({
       state.isLoading = isLoading;
     },
     [PROCESS_USER]: (state, user) => {
-      debugger;
       const userRecord = state.users.filter((u) => u.id === user.id).find((r) => r);
       const indexToUpdate = userRecord ? state.users.indexOf(userRecord) : -1;
 

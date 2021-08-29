@@ -3,30 +3,62 @@
     <div class="add-update__container">
       <h2>{{ `${addOrUpdate} User` }}</h2>
       <div class="add-update__form">
+          <b-field
+          :type="$v.userData.firstName.$error ? 'is-danger' : ''"
+          :message="$v.userData.firstName.$error ? 'First Name is Required' : ''">
           <b-input
             v-model="userData.firstName"
             placeholder="First Name" />
+          </b-field>
+          <b-field
+          :type="$v.userData.lastName.$error ? 'is-danger' : ''"
+          :message="$v.userData.lastName.$error ? 'Last Name is Required' : ''">
           <b-input
             v-model="userData.lastName"
             placeholder="Last Name"/>
+          </b-field>
+          <b-field
+          :type="$v.userData.email.$error ? 'is-danger' : ''"
+          :message="$v.userData.email.$error ? 'Email is Required' : ''">
           <b-input
             v-model="userData.email"
             placeholder="Email" />
+          </b-field>
+          <b-field
+          :type="$v.userData.company.$error ? 'is-danger' : ''"
+          :message="$v.userData.company.$error ? 'Company is Required' : ''">
           <b-input
             v-model="userData.company"
             placeholder="Company" />
+          </b-field>
+          <b-field
+          :type="$v.userData.city.$error ? 'is-danger' : ''"
+          :message="$v.userData.city.$error ? 'City is Required' : ''">
           <b-input
             v-model="userData.city"
             placeholder="City" />
+          </b-field>
+          <b-field
+          :type="$v.userData.country.$error ? 'is-danger' : ''"
+          :message="$v.userData.country.$error ? 'Country is Required' : ''">
           <b-input
             v-model="userData.country"
             placeholder="Country" />
+          </b-field>
+          <b-field
+          :type="$v.userData.countryCode.$error ? 'is-danger' : ''"
+          :message="$v.userData.countryCode.$error ? 'Country Code is Required' : ''">
           <b-input
             v-model="userData.countryCode"
             placeholder="Country Code" />
+          </b-field>
+          <b-field
+          :type="$v.userData.title.$error ? 'is-danger' : ''"
+          :message="$v.userData.title.$error ? 'Title is Required' : ''">
           <b-input
             v-model="userData.title"
             placeholder="Title" />
+          </b-field>
       </div>
       <div class="add-update__footer">
         <b-button type="is-primary" @click="processUser">{{ saveOrSubmit }}</b-button>
@@ -37,6 +69,7 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
 import extensions from '@/extensions';
 
 export default {
@@ -59,10 +92,10 @@ export default {
         title: '',
       },
       initialUserData: {},
+      errors: false,
     };
   },
   created() {
-    debugger;
     if (this.isUpdate) {
       this.initialUserData = extensions.DeepCopy(this.userInfo);
       this.userData = { ...this.initialUserData };
@@ -82,11 +115,18 @@ export default {
   methods: {
     processUser() {
       let user;
+
+      // validate form
+      this.$v.userData.$touch();
+      this.errors = this.$v.userData.$anyError;
+
+      if (this.errors) {
+        return;
+      }
+
       if (this.isUpdate) {
-        debugger;
         user = { ...this.initialUserData, ...this.userData };
       } else {
-        debugger;
         // create mock IP and ID
         const ipAddress = '127.0.0.1';
         const id = '1a2b3c4d5';
@@ -116,6 +156,34 @@ export default {
     },
     closeForm() {
       this.$emit('add-update-close');
+    },
+  },
+  validations: {
+    userData: {
+      firstName: {
+        required,
+      },
+      lastName: {
+        required,
+      },
+      email: {
+        required,
+      },
+      company: {
+        required,
+      },
+      city: {
+        required,
+      },
+      country: {
+        required,
+      },
+      countryCode: {
+        required,
+      },
+      title: {
+        required,
+      },
     },
   },
 };
@@ -151,6 +219,11 @@ export default {
       grid-template-columns: 1fr 1fr;
       gap: $spacing-unit-lg;
       margin: $spacing-unit-med 0 $spacing-unit-lg;
+
+      // buefy override
+      ::v-deep .field {
+        margin-bottom: 0
+      }
     }
 
     &__footer {

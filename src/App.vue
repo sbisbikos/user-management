@@ -9,14 +9,11 @@
     <section class="user-manager__content">
       <h1>User Management</h1>
       <div class="user-manager__toolbar">
-        <div class="user-manager__search">
-          <b-autocomplete
-              rounded
-              placeholder="e.g. FPO"
-              icon="magnify"
-              clearable >
-              <template #empty>No results found</template>
-          </b-autocomplete>
+        <div class="user-manager__add">
+          <b-button type="is-primary" @click="toggleAddUpdateUser">
+            <font-awesome-icon icon="plus" />
+          </b-button>
+          <span>Add User</span>
         </div>
         <div class="user-manager__actions">
           <b-select v-model="selectedSortOption" placeholder="Select a name" @input="fetchUsers(selectedSortOption)">
@@ -26,7 +23,6 @@
             <option value="country">Country</option>
             <option value="company">Company</option>
           </b-select>
-          <b-button type="is-primary" @click="toggleAddUpdateUser">Add User</b-button>
           <b-button
             :type="hasUserSelected ? 'is-danger' : ''"
             :disabled="!hasUserSelected"
@@ -98,7 +94,7 @@ export default {
       selectedUser: (state) => state.selectedUser,
     }),
     hasUserSelected() {
-      return this.selectedUser !== null;
+      return this.selectedUser !== -1;
     },
   },
   methods: {
@@ -166,7 +162,7 @@ export default {
   &__header {
     grid-area: header;
     background-color: #11222f;
-    padding: 12px 24px;
+    padding: 12px $spacing-unit-lg;
     box-shadow: 0 0 10px #474d52;
     position: relative;
     z-index: 2;
@@ -186,20 +182,41 @@ export default {
     background-color: white;
     box-shadow: 0 2px 4px #b3bfca;
     display: flex;
-    padding: $spacing-unit-lg;
+    padding: $spacing-unit-med $spacing-unit-lg;
     justify-content: space-between;
   }
 
-  &__search {
-    flex: 0 0 300px;
+  &__add {
+    display: flex;
+    align-items: center;
+
+    button {
+      border-radius: 9999px;
+      padding: 0;
+      margin: 0;
+      height: 50px;
+      width: 50px;
+    }
+
+    span {
+      margin-left: $spacing-unit-med;
+    }
+
+    svg {
+      width: $spacing-unit-lg;
+      height: $spacing-unit-lg;
+      position: relative;
+      top: 1px;
+    }
   }
 
   &__actions {
     flex: 0 0 auto;
     display: flex;
+    align-items: center;;
 
     > * {
-      margin-left: 24px;
+      margin-left: $spacing-unit-lg;
     }
   }
 

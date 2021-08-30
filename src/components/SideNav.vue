@@ -31,7 +31,7 @@ export default {
   .side-nav {
 
     &__links {
-      padding: 24px;
+      padding: $spacing-unit-lg;
     }
 
     &__link {

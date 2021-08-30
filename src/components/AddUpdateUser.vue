@@ -210,7 +210,7 @@ export default {
       width: 600px;
       transform: translate3d(-50%, -50%, 0);
       background-color: white;
-      padding: $spacing-unit-lg;
+      padding: $spacing-unit-lg 40px;
 
       h2 {
         font-size: 20px;

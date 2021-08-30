@@ -2,16 +2,16 @@
   <div v-if="userInfo" class="user">
     <div class="user__select">
       <b-field>
-        <b-checkbox @input="sendUserEvent($event)"/>
+        <b-checkbox @input="sendUserSelectedEvent($event)" :disabled="isSelectedMatches"/>
       </b-field>
     </div>
     <div class="user_active active-column">
       <b-field>
-        <b-switch :value="userInfo.isActive" @input="changeActive($event)"/>
+        <b-switch :value="userInfo.activated" @input="changeActive($event)"/>
       </b-field>
     </div>
     <div class="user__name column-stretch">
-      {{ `${userInfo.firstName} ${userInfo.lastName}` }}
+      {{ `${userInfo.firstname} ${userInfo.lastname}` }}
     </div>
     <div class="user__email column-stretch">
       {{ userInfo.email }}
@@ -20,10 +20,10 @@
       {{ userInfo.company }}
     </div>
     <div class="user__country country-column">
-      {{ userInfo.countryCode }}
+      {{ userInfo.addresses[0].country }}
     </div>
     <div class="user__created created-column">
-      {{ userInfo.created }}
+      {{ userInfo.created | convertUTCDate }}
     </div>
     <div class="user__edit edit-column">
       <font-awesome-icon @click="$emit('user-edit', index)" icon="edit"/>
@@ -44,16 +44,28 @@ export default {
       type: Number,
       required: true,
     },
+    selectedUser: {
+      type: Number,
+      required: true,
+    },
+  },
+  computed: {
+    isSelectedMatches() {
+      return this.selectedUser !== -1 && this.selectedUser !== this.index;
+    },
   },
   methods: {
     changeActive(value) {
       const user = extensions.DeepCopy(this.userInfo);
-      this.updateUser({ ...user, isActive: value });
+      this.$emit('user-activation', {
+        data: {
+          ...user, activated: value,
+        },
+        isUpdate: true,
+        id: user._id,
+      });
     },
-    updateUser(user) {
-      this.$emit('update-user', user);
-    },
-    sendUserEvent(value) {
+    sendUserSelectedEvent(value) {
       const eventData = {
         checked: value,
         index: this.index,

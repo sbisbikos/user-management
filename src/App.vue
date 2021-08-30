@@ -19,18 +19,18 @@
           </b-autocomplete>
         </div>
         <div class="user-manager__actions">
-          <b-select placeholder="Select a name">
-                  <option
-                      v-for="option in data"
-                      :value="option.id"
-                      :key="option.id">
-                      {{ option.user.first_name }}
-                  </option>
+          <b-select v-model="selectedSortOption" placeholder="Select a name" @input="fetchUsers(selectedSortOption)">
+            <option value="-created">Date Created</option>
+            <option value="firstname">FirstName Name</option>
+            <option value="lastname">Last Name</option>
+            <option value="country">Country</option>
+            <option value="company">Company</option>
           </b-select>
           <b-button type="is-primary" @click="toggleAddUpdateUser">Add User</b-button>
           <b-button
-            :type="hasUsersSelected ? 'is-danger' : ''"
-            :disabled="!hasUsersSelected">
+            :type="hasUserSelected ? 'is-danger' : ''"
+            :disabled="!hasUserSelected"
+            @click="deleteUsersHandler">
               Delete
           </b-button>
         </div>
@@ -38,21 +38,29 @@
       <user-info-titles />
       <!-- loading flag -->
       <!-- transition group -->
-      <div class="user-manager__user-container">
-        <user v-for="(user, index) in users"
-          :key="index"
-          :user-info="user"
-          :index="index"
-          @user-selected="setSelectedUser($event)"
-          @user-edit="toggleAddUpdateUser" />
+      <div class="user-manager__user-wrapper">
+        <transition name="fade">
+        <div v-if="!isLoading" class="user-manager__user-container">
+          <user v-for="(user, index) in systemUsers"
+            :key="user.id"
+            :user-info="user"
+            :index="index"
+            :selectedUser="selectedUser"
+            @user-activation="processUserHandler"
+            @user-selected="setSelectedUser"
+            @user-edit="toggleAddUpdateUser" />
+        </div>
+        </transition>
+        <b-loading :is-full-page="false" v-model="isLoading" :can-cancel="false"></b-loading>
       </div>
-      <!--  <user v-for="(user, index) in users" :key="index" :user-info="user" index="index" /> user sends emitter to delete  -->
     </section>
-    <add-update-user
-    v-if="isAddUpdateUserVisible"
-    :user-info="userToEdit"
-    @add-update-close="toggleAddUpdateUser"
-    @user-changes="processUser" />
+    <transition name="fade">
+      <add-update-user
+        v-if="isAddUpdateUserVisible"
+        :user-info="userToEdit"
+        @add-update-close="toggleAddUpdateUser"
+        @user-changes="processUserHandler" />
+    </transition>
   </div>
 </template>
 
@@ -63,7 +71,6 @@ import SideNav from '@/components/SideNav';
 import User from '@/components/User';
 import AddUpdateUser from '@/components/AddUpdateUser';
 import UserInfoTitles from '@/components/UserInfoTitles';
-import extensions from '@/extensions';
 
 export default {
   name: 'app',
@@ -76,7 +83,7 @@ export default {
   },
   data() {
     return {
-      selectedUsers: [],
+      selectedSortOption: '-created',
       isAddUpdateUserVisible: false,
       userToEdit: {},
     };
@@ -86,36 +93,60 @@ export default {
   },
   computed: {
     ...mapState({
-      users: (state) => state.users,
+      systemUsers: (state) => state.systemUsers,
+      isLoading: (state) => state.isLoading,
+      selectedUser: (state) => state.selectedUser,
     }),
-    hasUsersSelected() {
-      return this.selectedUsers.length > 0;
+    hasUserSelected() {
+      return this.selectedUser !== null;
     },
   },
   methods: {
     ...mapActions({
       fetchUsers: 'fetchUsers',
-      processUser: 'processUser',
+      processUserData: 'processUserData',
+      deleteUser: 'deleteUser',
+      updateSelectedUser: 'updateSelectedUser',
     }),
+    deleteUsersHandler() {
+      this.deleteUser(this.systemUsers[this.selectedUser]._id).then(() => {
+        // clear checkboxes / reset selected users
+        this.updateSelectedUser(-1);
+
+        this.$buefy.toast.open({
+          message: 'User has been deleted',
+          type: 'is-warning',
+        });
+      });
+    },
+    processUserHandler(userData) {
+      this.processUserData(userData).then((isUpdate) => {
+        const message = isUpdate ? 'User updated' : 'User added';
+
+        this.$buefy.toast.open({
+          message,
+          type: 'is-success',
+        });
+      });
+    },
     setSelectedUser(value) {
       if (value.checked) {
-        this.selectedUsers.push(value.index);
+        this.updateSelectedUser(value.index);
       } else {
-        extensions.RemoveValueFromArray(value.index, this.selectedUsers);
+        this.updateSelectedUser(-1);
       }
     },
     toggleAddUpdateUser(value = -1) {
       // if index is provided we update
-      // this will also clear the object is we do a standard add
-      this.userToEdit = Number.isInteger(value) && value > -1 ? this.users[value] : {};
-      const test = !this.isAddUpdateUserVisible;
-      this.isAddUpdateUserVisible = test;
+      // this will also clear the edit object if we do a standard add
+      this.userToEdit = Number.isInteger(value) && value > -1 ? this.systemUsers[value] : {};
+      this.isAddUpdateUserVisible = !this.isAddUpdateUserVisible;
     },
   },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #app {
   font-family: 'Roboto', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -172,6 +203,29 @@ export default {
     }
   }
 
+  &__user-wrapper {
+    position: relative;
+    min-height: 300px;
+
+    // Buefy overrides
+    ::v-deep .loading-icon:after {
+      border: 2px solid #50a1e1;
+      border-right-color: transparent;
+      border-top-color: transparent;
+      width: 5em;
+      height: 5em;
+      border-width: 0.5em;
+    }
+
+    ::v-deep .loading-background {
+      background-color: transparent;
+    }
+  }
+
+  &__user-container {
+    box-shadow: 0 2px 4px #b3bfca;
+  }
+
   &__content {
     grid-area: content;
     background-color: #d3e0ea;
@@ -183,5 +237,12 @@ export default {
       margin-bottom: 8px;
     }
   }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .7s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

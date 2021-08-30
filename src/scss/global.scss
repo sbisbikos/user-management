@@ -9,6 +9,9 @@ $spacing-unit-sml: 8px;
 $spacing-unit-med: 16px;
 $spacing-unit-lg: 24px;
 
+$loading-background: transparent;
+$loading-icon-size: 5em;
+
 // mixins
 @mixin content-stretch {
   flex: $flex-fractional-size;
@@ -16,6 +19,52 @@ $spacing-unit-lg: 24px;
 
 @mixin content-auto-size($size) {
   flex: 0 0 #{$size};
+}
+
+/* Mobile First Viewports */
+@mixin viewport-360 {
+  @media screen and (min-width: 360px)
+    { @content; }
+}
+
+@mixin viewport-412 {
+  @media screen and (min-width: 412px)
+    { @content; }
+}
+
+@mixin viewport-667 {
+  @media screen and (min-width: 667px)
+    { @content; }
+}
+
+@mixin viewport-768 {
+  @media screen and (min-width: 768px)
+    { @content; }
+}
+
+@mixin viewport-800 {
+  @media screen and (min-width: 800px)
+    { @content; }
+}
+
+@mixin viewport-1024 {
+  @media screen and (min-width: 1024px)
+    { @content; }
+}
+
+@mixin viewport-1280 {
+  @media screen and (min-width: 1280px)
+    { @content; }
+}
+
+@mixin viewport-1366 {
+  @media screen and (min-width: 1366px)
+    { @content; }
+}
+
+@mixin viewport-1920 {
+  @media screen and (min-width: 1920px)
+    { @content; }
 }
 
 // classes

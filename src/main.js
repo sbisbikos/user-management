@@ -6,12 +6,14 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faHome, faThLarge, faChartLine, faUsers, faEdit, faTimes,
 } from '@fortawesome/free-solid-svg-icons';
+import { convertUTCDate } from '@/filters/string-formating';
 import App from './App';
 import store from './store';
 import 'buefy/dist/buefy.css';
 
 library.add(faHome, faThLarge, faChartLine, faUsers, faEdit, faTimes);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.filter('convertUTCDate', convertUTCDate);
 
 // Register Vuelidate for validation
 Vue.use(Vuelidate);

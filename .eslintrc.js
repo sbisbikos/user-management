@@ -11,6 +11,7 @@ module.exports = {
     parser: 'babel-eslint',
   },
   rules: {
+    'no-underscore-dangle': ["error", { "allow": ["_id"] }],
     'no-unused-expressions': 'off',
     'func-names': 'off',
     'import/no-extraneous-dependencies': ['error', {

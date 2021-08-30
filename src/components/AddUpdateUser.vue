@@ -4,18 +4,25 @@
       <h2>{{ `${addOrUpdate} User` }}</h2>
       <div class="add-update__form">
           <b-field
-          :type="$v.userData.firstName.$error ? 'is-danger' : ''"
-          :message="$v.userData.firstName.$error ? 'First Name is Required' : ''">
+          :type="$v.userData.firstname.$error ? 'is-danger' : ''"
+          :message="$v.userData.firstname.$error ? 'First Name is Required' : ''">
           <b-input
-            v-model="userData.firstName"
+            v-model="userData.firstname"
             placeholder="First Name" />
           </b-field>
           <b-field
-          :type="$v.userData.lastName.$error ? 'is-danger' : ''"
-          :message="$v.userData.lastName.$error ? 'Last Name is Required' : ''">
+          :type="$v.userData.lastname.$error ? 'is-danger' : ''"
+          :message="$v.userData.lastname.$error ? 'Last Name is Required' : ''">
           <b-input
-            v-model="userData.lastName"
+            v-model="userData.lastname"
             placeholder="Last Name"/>
+          </b-field>
+          <b-field
+          :type="$v.userData.username.$error ? 'is-danger' : ''"
+          :message="$v.userData.username.$error ? 'Username is Required' : ''">
+          <b-input
+            v-model="userData.username"
+            placeholder="Username"/>
           </b-field>
           <b-field
           :type="$v.userData.email.$error ? 'is-danger' : ''"
@@ -32,31 +39,24 @@
             placeholder="Company" />
           </b-field>
           <b-field
-          :type="$v.userData.city.$error ? 'is-danger' : ''"
-          :message="$v.userData.city.$error ? 'City is Required' : ''">
+          :type="$v.userData.addresses.postalCode.$error ? 'is-danger' : ''"
+          :message="$v.userData.addresses.postalCode.$error ? 'Postal Code is Required' : ''">
           <b-input
-            v-model="userData.city"
-            placeholder="City" />
+            v-model="userData.addresses.postalCode"
+            placeholder="Postal Code" />
           </b-field>
           <b-field
-          :type="$v.userData.country.$error ? 'is-danger' : ''"
-          :message="$v.userData.country.$error ? 'Country is Required' : ''">
+          :type="$v.userData.addresses.country.$error ? 'is-danger' : ''"
+          :message="$v.userData.addresses.country.$error ? 'Country is Required' : ''">
           <b-input
-            v-model="userData.country"
+            v-model="userData.addresses.country"
             placeholder="Country" />
           </b-field>
           <b-field
-          :type="$v.userData.countryCode.$error ? 'is-danger' : ''"
-          :message="$v.userData.countryCode.$error ? 'Country Code is Required' : ''">
+          :type="$v.userData.jobTitle.$error ? 'is-danger' : ''"
+          :message="$v.userData.jobTitle.$error ? 'Job Title is Required' : ''">
           <b-input
-            v-model="userData.countryCode"
-            placeholder="Country Code" />
-          </b-field>
-          <b-field
-          :type="$v.userData.title.$error ? 'is-danger' : ''"
-          :message="$v.userData.title.$error ? 'Title is Required' : ''">
-          <b-input
-            v-model="userData.title"
+            v-model="userData.jobTitle"
             placeholder="Title" />
           </b-field>
       </div>
@@ -82,14 +82,16 @@ export default {
   data() {
     return {
       userData: {
-        firstName: '',
-        lastName: '',
+        firstname: '',
+        lastname: '',
+        username: '',
         email: '',
         company: '',
-        city: '',
-        country: '',
-        countryCode: '',
-        title: '',
+        addresses: {
+          country: '',
+          postalCode: '',
+        },
+        jobTitle: '',
       },
       initialUserData: {},
       errors: false,
@@ -97,8 +99,15 @@ export default {
   },
   created() {
     if (this.isUpdate) {
+      // copy to avoid passing by reference
       this.initialUserData = extensions.DeepCopy(this.userInfo);
-      this.userData = { ...this.initialUserData };
+
+      // flatten array so we don't need to deal with multiple addresses
+      // eslint-disable-next-line prefer-destructuring
+      this.initialUserData.addresses = this.initialUserData.addresses[0];
+
+      // assign previous values to form
+      Object.keys(this.userData).forEach((key) => { this.userData[key] = this.initialUserData[key]; });
     }
   },
   computed: {
@@ -125,34 +134,27 @@ export default {
       }
 
       if (this.isUpdate) {
-        user = { ...this.initialUserData, ...this.userData };
-      } else {
-        // create mock IP and ID
-        const ipAddress = '127.0.0.1';
-        const id = '1a2b3c4d5';
-        const created = this.getCurrentDate();
-
         user = {
-          ...this.userData,
-          isActive: true,
-          created,
-          ipAddress,
-          id,
+          data: {
+            ...this.userData,
+            addresses: [this.userData.addresses], // put addresses back
+          },
+          isUpdate: this.isUpdate,
+          id: this.initialUserData._id,
+        };
+      } else {
+        user = {
+          data: {
+            ...this.userData,
+            addresses: [this.userData.addresses], // put addresses back
+            activated: true,
+          },
+          isUpdate: this.isUpdate,
         };
       }
 
       this.$emit('user-changes', user);
       this.closeForm();
-    },
-    getCurrentDate() {
-      let currentDate = new Date();
-      const dd = String(currentDate.getDate()).padStart(2, '0');
-      const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const yyyy = currentDate.getFullYear();
-
-      currentDate = `${mm}/${dd}/${yyyy}`;
-
-      return currentDate;
     },
     closeForm() {
       this.$emit('add-update-close');
@@ -160,10 +162,13 @@ export default {
   },
   validations: {
     userData: {
-      firstName: {
+      firstname: {
         required,
       },
-      lastName: {
+      lastname: {
+        required,
+      },
+      username: {
         required,
       },
       email: {
@@ -172,16 +177,15 @@ export default {
       company: {
         required,
       },
-      city: {
-        required,
+      addresses: {
+        country: {
+          required,
+        },
+        postalCode: {
+          required,
+        },
       },
-      country: {
-        required,
-      },
-      countryCode: {
-        required,
-      },
-      title: {
+      jobTitle: {
         required,
       },
     },

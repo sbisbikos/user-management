@@ -22,6 +22,8 @@ npm run test
 ```
 
 ### Run your unit test collection coverage
+![image](https://user-images.githubusercontent.com/10504635/131434697-b91dc0b8-172a-4187-b882-91ae42602643.png)
+
 ```
 npm run test:coverage
 ```

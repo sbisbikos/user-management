@@ -32,7 +32,6 @@
         </div>
       </div>
       <user-info-titles />
-      <!-- loading flag -->
       <!-- transition group -->
       <div class="user-manager__user-wrapper">
         <transition name="fade">
@@ -106,7 +105,7 @@ export default {
     }),
     deleteUsersHandler() {
       this.deleteUser(this.systemUsers[this.selectedUser]._id).then(() => {
-        // clear checkboxes / reset selected users
+        // reset selected users
         this.updateSelectedUser(-1);
 
         this.$buefy.toast.open({

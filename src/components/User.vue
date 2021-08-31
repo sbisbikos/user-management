@@ -2,7 +2,7 @@
   <div v-if="userInfo" class="user">
     <div class="user__select">
       <b-field>
-        <b-checkbox @input="sendUserSelectedEvent($event)" :disabled="isSelectedMatches"/>
+        <b-checkbox @input="sendUserSelectedEvent($event)" :disabled="isSelectedNotMatching"/>
       </b-field>
     </div>
     <div class="user_active active-column">
@@ -50,7 +50,7 @@ export default {
     },
   },
   computed: {
-    isSelectedMatches() {
+    isSelectedNotMatching() {
       return this.selectedUser !== -1 && this.selectedUser !== this.index;
     },
   },

@@ -18,7 +18,12 @@ npm run build
 
 ### Run your unit tests
 ```
-npm run test:unit
+npm run test
+```
+
+### Run your unit test collection coverage
+```
+npm run test:coverage
 ```
 
 ### Lints and fixes files
